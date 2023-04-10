@@ -1,0 +1,16 @@
+/*
+ * 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
+ */
+
+SELECT cp.payroll_year,
+	ROUND (AVG(value)) AS average_salary,
+	cp.industry_branch_code,
+	cpib.name 
+FROM czechia_payroll cp
+JOIN czechia_payroll_industry_branch cpib
+	ON cp.industry_branch_code = cpib.code
+WHERE cp.value IN 
+	(SELECT cp.value
+	FROM czechia_payroll cp
+	WHERE cp.industry_branch_code = 'A')
+GROUP BY payroll_year;
