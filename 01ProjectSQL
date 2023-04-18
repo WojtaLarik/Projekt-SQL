@@ -14,3 +14,41 @@ WHERE cp.value IN
 	FROM czechia_payroll cp
 	WHERE cp.industry_branch_code = 'A')
 GROUP BY payroll_year;
+
+/*
+ * Úpravy 
+ */
+
+/*
+ * 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
+ */
+
+SELECT cp.payroll_year AS `year`,
+	ROUND (AVG(value)) AS `average_salary`,
+	cp.industry_branch_code,
+	cpib.name 
+FROM czechia_payroll cp
+JOIN czechia_payroll_industry_branch cpib
+	ON cp.industry_branch_code = cpib.code
+WHERE cp.value_type_code = 5958
+GROUP BY payroll_year, cpib.name
+ORDER BY payroll_year;
+
+DROP TABLE t_vojta_s_salary;
+
+
+/*
+ * 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první
+ * a poslední srovnatelné období v dostupných datech cen a mezd?
+ */
+
+SELECT
+	YEAR(date_from) AS year,
+	cpc.name,
+	cprice.value,
+	cpc.price_unit 
+FROM czechia_price cprice
+JOIN czechia_price_category cpc
+	ON cprice.category_code = cpc.code
+WHERE cpc.name = 'Mléko polotučné pasterované' OR cpc.name = 'Chléb konzumní kmínový'
+GROUP BY year, cpc.name;
